@@ -52,10 +52,6 @@ colnames(dat_td_raw)[2:ncol(dat_td_raw)] <- paste0("R",formatC(1:214, width = 3,
 ## add network-level mean TDp
 dat_td_net <- AddNetworkScore_Power(dat_td_raw, net_anna)
 
-##############   Collect for PSMD    ####################
-# network identification
-dat_psmd <- EstPSMD(dat_td_net, net_annotation = net_anna)
-
 #################  Collect for ETS   ####################
 # load the data
 file_names <- list.files(path_ets, pattern = 'sub-[0-9]*_rms.csv', full.names = T)
