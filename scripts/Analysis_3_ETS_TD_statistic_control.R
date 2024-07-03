@@ -24,6 +24,10 @@ dat_use <- rio::import("inputs/Analysis2_collect_fMRI.xlsx")
 dat_hama <- dat_use %>% select(starts_with("HAMA"))
 dat_use <- dat_use %>% mutate(HAMA_wave1_total = rowSums(dat_hama))
 
+# define the cut-off 
+cut_hama <- 24
+cut_hamd <- 24
+
 #################################################
 #
 # 1 difference of peak height
@@ -81,7 +85,7 @@ p.adjust(c(.352, .095, 1), method = "fdr") # p-value adjust
 
 dat_anxiety <- dat_use %>% 
   mutate(anxiety_group = ifelse(group == "HC", "HC",
-                                ifelse(HAMA_wave1_total > 21, "severe", "moderated")))
+                                ifelse(HAMA_wave1_total >= cut_hama, "severe", "moderated")))
 
 dat_anxiety %>%  # difference between HC and MDD whole group
   bruceR::MANOVA(subID = "participant_id", dv = "duration_mean", 
@@ -90,9 +94,9 @@ dat_anxiety %>%  # difference between HC and MDD whole group
 # ─────────────────────────────────────────────────────────────────────────────────
 # Contrast Estimate    S.E.  df      t     p     Cohen’s d [95% CI of d]
 # ─────────────────────────────────────────────────────────────────────────────────
-# moderated - HC       -0.057 (0.055) 206 -1.037  .452      -0.188 [-0.625, 0.249]
-# severe - HC          -0.068 (0.056) 206 -1.201  .452      -0.222 [-0.667, 0.224]
-# severe - moderated   -0.010 (0.058) 206 -0.179  .858      -0.034 [-0.489, 0.422]
+# moderated - HC       -0.063 (0.054) 206 -1.180  .450      -0.207 [-0.629, 0.216]
+# severe - HC          -0.061 (0.059) 206 -1.039  .450      -0.200 [-0.666, 0.265]
+# severe - moderated    0.002 (0.059) 206  0.032  .974       0.006 [-0.456, 0.468]
 # ─────────────────────────────────────────────────────────────────────────────────
 
 dat_anxiety %>% # SMN td for HC and MDD whole group 
@@ -102,9 +106,9 @@ dat_anxiety %>% # SMN td for HC and MDD whole group
 # ────────────────────────────────────────────────────────────────────────────────
 # Contrast Estimate    S.E.  df     t     p     Cohen’s d [95% CI of d]
 # ────────────────────────────────────────────────────────────────────────────────
-# moderated - HC        0.003 (0.010) 206 0.267  .790       0.048 [-0.389, 0.485]
-# severe - HC           0.014 (0.010) 206 1.399  .402       0.258 [-0.187, 0.703]
-# severe - moderated    0.011 (0.010) 206 1.111  .402       0.210 [-0.246, 0.665]
+# moderated - HC        0.004 (0.009) 206 0.475  .635       0.083 [-0.339, 0.506]
+# severe - HC           0.013 (0.010) 206 1.267  .600       0.244 [-0.221, 0.710]
+# severe - moderated    0.009 (0.010) 206 0.843  .600       0.161 [-0.300, 0.623]
 # ────────────────────────────────────────────────────────────────────────────────
 
 #################################################
@@ -115,7 +119,7 @@ dat_anxiety %>% # SMN td for HC and MDD whole group
 
 dat_use <- dat_use %>%
   mutate(severity = ifelse(group=="HC","HC",
-                     ifelse(HAMD_wave1_total >= 24,"severe","moderated")))
+                     ifelse(HAMD_wave1_total >= cut_hamd,"severe","moderated")))
 
 # For trough duration ------------------------------------------------------
 dat_use %>% filter(group != "HC") %>% # between agitation subtypes

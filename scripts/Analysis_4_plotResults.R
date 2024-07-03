@@ -13,6 +13,10 @@ library(patchwork)
 # load the data
 dat_use <- rio::import("inputs/Analysis2_collect_fMRI.xlsx")
 
+# define the cut-off 
+cut_hama <- 24
+cut_hamd <- 24
+
 #########################################################
 #
 # Main findings Result visualization
@@ -113,7 +117,7 @@ dat_hama <- dat_use %>% select(starts_with("HAMA"))
 dat_use <- dat_use %>% mutate(HAMA_wave1_total = rowSums(dat_hama))
 dat_use <- dat_use %>% 
   mutate(anxiety_group = ifelse(group == "HC", "HC",
-                                ifelse(HAMA_wave1_total > 21, "severe", "moderated")))
+                                ifelse(HAMA_wave1_total >= cut_hama, "severe", "moderated")))
 
 p_control_duration <- dat_use %>%
   ggplot(aes(y = duration_mean, x = anxiety_group, fill = anxiety_group)) +
@@ -144,7 +148,7 @@ p_control_tdSMN
 #########################################################
 dat_use <- dat_use %>%
   mutate(severity = ifelse(group=="HC","HC",
-                           ifelse(HAMD_wave1_total >= 24,"severe","moderated")))
+                           ifelse(HAMD_wave1_total >= cut_hamd,"severe","moderated")))
 
 p_severe_duration <- dat_use %>%
   ggplot(aes(y = duration_mean, x = severity, fill = severity)) +
@@ -170,6 +174,8 @@ p_severe_tdSMN
 
 p_control_all <- p_control_duration + p_control_tdSMN + p_severe_duration + p_severe_tdSMN +
   patchwork::plot_annotation(tag_levels = "A")
+
+p_control_all
 ggsave(plot = p_control_all, filename = "outputs/FigS3.png",
        height = 8, width = 10, dpi = 300)
 ggsave(plot = p_control_all, filename = "outputs/FigS3.tiff",
